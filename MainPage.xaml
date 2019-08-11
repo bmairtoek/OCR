@@ -1,0 +1,51 @@
+﻿<Page
+    x:Class="OCR.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:OCR"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    <Grid>
+        <ScrollViewer HorizontalScrollBarVisibility="Auto" Margin="512,10,10,10">
+            <TextBlock Name="outputBlock" Height="617" Text="" TextWrapping="Wrap" Width="504" Margin="0,0,0,0"/>
+        </ScrollViewer>
+        <Grid Margin="0,0,517,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition Width="7*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <StackPanel Grid.Column="0" Margin="0,0,0,0" VerticalAlignment="Center">
+                <Button Click="Pick_Files" x:Name="ButtonSave" HorizontalAlignment="Center">
+                    <StackPanel Orientation="Horizontal">
+                        <SymbolIcon Symbol="Folder"/>
+                        <TextBlock Text="Wybierz pliki" Margin="10,0,0,0"/>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+            <StackPanel Grid.Row="0" Grid.Column="1">
+                <ScrollViewer HorizontalAlignment="Stretch" Height="159">
+                    <TextBox Name="files" TextWrapping="Wrap" Height="131" Width="321" IsReadOnly="True"/>
+                </ScrollViewer>
+            </StackPanel>
+            <StackPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <TextBlock Text="Wybierz Silnik OCR:"/>
+            </StackPanel>
+            <StackPanel Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center">
+                <RadioButton Content="Windows Media OCR" Tag="Microsoft" IsChecked="True"/>
+                <RadioButton Content="Google Cloud OCR" Tag="Google"/>
+            </StackPanel>
+            <StackPanel Grid.Row="3" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Button Content="OCR" Click="Button_Click"/>
+            </StackPanel>
+        </Grid>
+    </Grid>
+
+</Page>
