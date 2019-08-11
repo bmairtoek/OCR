@@ -15,6 +15,8 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using Windows.Storage;
 using OCR.OcrEngines;
+using System.Threading;
+using System.Threading.Tasks;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -57,18 +59,43 @@ namespace OCR
             }
         }
 
-        private async void Button_Click(object sender, RoutedEventArgs e)
+        private async void Recognize_Text(object sender, RoutedEventArgs e)
         {
             this.outputBlock.Text = string.Empty;
             if (this.pickedFiles.Count > 0)
             {
-                IOcrEngine ocrEngine = OcrEngineFactory.createMicrosoftOcrEngine();
-                this.outputBlock.Text = await ocrEngine.RecognizeAsync(pickedFiles);
+                IOcrEngine ocrEngine = null;
+                switch (this.GetSelectedRadioButtonTag())
+                {
+                    case "Microsoft":
+                        ocrEngine = OcrEngineFactory.createMicrosoftOcrEngine();
+                        break;
+                    case "Google":
+                        ocrEngine = OcrEngineFactory.createGoogleOcrEngine();
+                        break;
+                }
+                //this.outputBlock.Text = await ocrEngine.RecognizeAsync(pickedFiles);
+                string newText = string.Empty;
+                await Task.Run(async() => { newText = await ocrEngine.RecognizeAsync(pickedFiles); });
+                this.outputBlock.Text = newText;
             }
             else
             {
                 this.outputBlock.Text = "Pick files first";
             }
+        }
+
+        private string GetSelectedRadioButtonTag()
+        {
+            var radioButtons = engines.Children.OfType<RadioButton>();
+            foreach (var radioButton in radioButtons)
+            {
+                if (radioButton.IsChecked == true)
+                {
+                    return radioButton.Tag as string;
+                }
+            }
+            throw new Exception("radio button no selected");
         }
     }
 }

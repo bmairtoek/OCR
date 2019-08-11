@@ -9,10 +9,15 @@ namespace OCR.OcrEngines
 {
     class GoogleOcrEngine: IOcrEngine
     {
-
-        public Task<string> RecognizeAsync(List<StorageFile> pickedFiles)
+        public async Task<string> RecognizeAsync(List<StorageFile> pickedFiles)
         {
-            return new Task<string>(() => { return string.Empty; });
+            StringBuilder output = new StringBuilder();
+            var responses = new GoogleConfig.Creator().SendGoogleOcrRequest(pickedFiles);
+            foreach(var response in responses.Responses)
+            {
+                output.Append(response.FullTextAnnotation.Text + "\n");
+            }
+            return output.ToString();
         }
     }
 }

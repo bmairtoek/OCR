@@ -8,8 +8,8 @@
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
     <Grid>
-        <ScrollViewer HorizontalScrollBarVisibility="Auto" Margin="512,10,10,10">
-            <TextBlock Name="outputBlock" Height="617" Text="" TextWrapping="Wrap" Width="504" Margin="0,0,0,0"/>
+        <ScrollViewer VerticalScrollBarVisibility="Visible" Margin="512,10,10,10">
+            <TextBlock Name="outputBlock" Text="" TextWrapping="Wrap" Margin="0,0,0,0"/>
         </ScrollViewer>
         <Grid Margin="0,0,517,0">
             <Grid.ColumnDefinitions>
@@ -38,12 +38,12 @@
             <StackPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center">
                 <TextBlock Text="Wybierz Silnik OCR:"/>
             </StackPanel>
-            <StackPanel Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center">
-                <RadioButton Content="Windows Media OCR" Tag="Microsoft" IsChecked="True"/>
-                <RadioButton Content="Google Cloud OCR" Tag="Google"/>
+            <StackPanel x:Name="engines" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center">
+                <RadioButton Content="Windows Media OCR" GroupName="Engines" Tag="Microsoft" IsChecked="True"/>
+                <RadioButton Content="Google Cloud OCR" GroupName="Engines" Tag="Google"/>
             </StackPanel>
             <StackPanel Grid.Row="3" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center">
-                <Button Content="OCR" Click="Button_Click"/>
+                <Button Content="OCR" Click="Recognize_Text"/>
             </StackPanel>
         </Grid>
     </Grid>
