@@ -35,6 +35,8 @@ namespace OCR
 
         private async void Pick_Files(object sender, RoutedEventArgs e)
         {
+            new ImageProcessing.Blur().Execute();
+
             var picker = new Windows.Storage.Pickers.FileOpenPicker();
             picker.ViewMode = Windows.Storage.Pickers.PickerViewMode.Thumbnail;
             picker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.PicturesLibrary;
@@ -74,7 +76,6 @@ namespace OCR
                         ocrEngine = OcrEngineFactory.createGoogleOcrEngine();
                         break;
                 }
-                //this.outputBlock.Text = await ocrEngine.RecognizeAsync(pickedFiles);
                 string newText = string.Empty;
                 await Task.Run(async() => { newText = await ocrEngine.RecognizeAsync(pickedFiles); });
                 this.outputBlock.Text = newText;
