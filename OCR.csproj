@@ -121,6 +121,8 @@
     </Compile>
     <Compile Include="ImageProcessing\Blur.cs" />
     <Compile Include="ImageProcessing\IImageProcessor.cs" />
+    <Compile Include="ImageProcessing\KeystoneEffect.cs" />
+    <Compile Include="ImageProcessing\Rotate.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>

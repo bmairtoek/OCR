@@ -17,6 +17,7 @@ using Windows.Storage;
 using OCR.OcrEngines;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -35,11 +36,14 @@ namespace OCR
 
         private async void Pick_Files(object sender, RoutedEventArgs e)
         {
-            new ImageProcessing.Blur().Execute();
+            new ImageProcessing.Rotate().Execute();
+            Debugger.Log(1, "", Path.GetTempPath());
 
-            var picker = new Windows.Storage.Pickers.FileOpenPicker();
-            picker.ViewMode = Windows.Storage.Pickers.PickerViewMode.Thumbnail;
-            picker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.PicturesLibrary;
+            var picker = new Windows.Storage.Pickers.FileOpenPicker
+            {
+                ViewMode = Windows.Storage.Pickers.PickerViewMode.Thumbnail,
+                SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.PicturesLibrary
+            };
             picker.FileTypeFilter.Add(".jpg");
             picker.FileTypeFilter.Add(".jpeg");
             picker.FileTypeFilter.Add(".png");
