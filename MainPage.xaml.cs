@@ -15,9 +15,11 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using Windows.Storage;
 using OCR.OcrEngines;
+using OCR.Enums;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using OCR.ImageProcessing;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -29,16 +31,15 @@ namespace OCR
     public sealed partial class MainPage : Page
     {
         private List<StorageFile> pickedFiles = new List<StorageFile>();
+        private Informator informator;
         public MainPage()
         {
             this.InitializeComponent();
+            this.informator = new Informator(outputBlock);
         }
 
         private async void Pick_Files(object sender, RoutedEventArgs e)
         {
-            new ImageProcessing.Rotate().Execute();
-            Debugger.Log(1, "", Path.GetTempPath());
-
             var picker = new Windows.Storage.Pickers.FileOpenPicker
             {
                 ViewMode = Windows.Storage.Pickers.PickerViewMode.Thumbnail,
@@ -56,51 +57,106 @@ namespace OCR
                 foreach (StorageFile file in files)
                 {
                     this.pickedFiles.Add(file);
-                    this.files.Text += file.Path + " \n";
                 }
             }
-            else
-            {
-                this.files.Text = "Operation cancelled.";
-            }
+            this.files.Text = pickedFiles.Count.ToString();
         }
 
         private async void Recognize_Text(object sender, RoutedEventArgs e)
         {
-            this.outputBlock.Text = string.Empty;
-            if (this.pickedFiles.Count > 0)
+            if (this.pickedFiles.Count <= 0)
+                return;
+            this.informator.Clear();
+            this.ClearTempFolder();
+
+            List<IImageProcessor> selectedDistorsions = this.GetSelectedDistorsions();
+            int samples = Convert.ToInt32(SamplesSlider.Value);
+            await Task.Run(()=>CreateDistortedImages(selectedDistorsions, samples));
+
+            // run recognition for each selected engine
+            List<IOcrEngine> selectedEngines = this.GetSelectedEngines();
+            foreach (IOcrEngine engine in selectedEngines)
             {
-                IOcrEngine ocrEngine = null;
-                switch (this.GetSelectedRadioButtonTag())
-                {
-                    case "Microsoft":
-                        ocrEngine = OcrEngineFactory.createMicrosoftOcrEngine();
-                        break;
-                    case "Google":
-                        ocrEngine = OcrEngineFactory.createGoogleOcrEngine();
-                        break;
-                }
                 string newText = string.Empty;
-                await Task.Run(async() => { newText = await ocrEngine.RecognizeAsync(pickedFiles); });
+                await Task.Run(async () => { newText = await engine.RecognizeAsync(pickedFiles); });
                 this.outputBlock.Text = newText;
             }
-            else
+        }
+        private void ClearTempFolder()
+        {
+            string tmpPath = Path.GetTempPath();
+            string[] files = Directory.GetFiles(tmpPath, "*.*", SearchOption.AllDirectories);
+            foreach (var file in files)
             {
-                this.outputBlock.Text = "Pick files first";
+                if (File.Exists(file))
+                {
+                    File.Delete(file);
+                }
             }
         }
 
-        private string GetSelectedRadioButtonTag()
+        private void CreateDistortedImages(List<IImageProcessor> selectedDistorsions, int samples)
         {
-            var radioButtons = engines.Children.OfType<RadioButton>();
-            foreach (var radioButton in radioButtons)
+            string tempPath = Path.GetTempPath();
+            Debug.WriteLine(tempPath);
+            foreach (StorageFile file in this.pickedFiles)
             {
-                if (radioButton.IsChecked == true)
+                string fileFolderPath = Directory.CreateDirectory(Path.Combine(tempPath, Path.GetFileName(file.Path))).FullName;
+                foreach (IImageProcessor distorsion in selectedDistorsions)
                 {
-                    return radioButton.Tag as string;
+                    string distortionFolderPath = Directory.CreateDirectory(Path.Combine(fileFolderPath, distorsion.GetType().ToString())).FullName;
+                    if (samples == 1)
+                    {
+                        distorsion.Execute(distorsion.MaximalValue, file, distortionFolderPath);
+                    }
+                    else
+                    {
+                        for (int i = 1; i <= samples; i++)
+                        {
+                            this.informator.Log("Executing "+distorsion.GetType().ToString()+" - "+i+" out of "+samples);
+                            float value = distorsion.MinimalValue + (distorsion.MaximalValue - distorsion.MinimalValue) / samples * i;
+                            distorsion.Execute(value, file, distortionFolderPath);
+                        }
+                    }
+                }
+                this.informator.Log("Finished distorting image: " + Path.GetFileName(file.Path));
+            }
+            this.informator.Log("Finished creation of distorted images");
+        }
+        private List<IImageProcessor> GetSelectedDistorsions()
+        {
+            List<IImageProcessor> selectedProcessors = new List<IImageProcessor>();
+            var toggleSwitches = distortions1.Children.OfType<ToggleSwitch>().Concat(distortions2.Children.OfType<ToggleSwitch>());
+            foreach (var toggleSwitch in toggleSwitches)
+            {
+                if (toggleSwitch.IsOn == false)
+                    continue;
+
+                if (toggleSwitch.Tag.ToString().Equals(Distortions.Blur))
+                    selectedProcessors.Add(ImageProcessorFactory.CreateBlurProcessor());
+                else if (toggleSwitch.Tag.ToString().Equals(Distortions.Rotation))
+                    selectedProcessors.Add(ImageProcessorFactory.CreateRotateProcessor());
+                else if (toggleSwitch.Tag.ToString().Equals(Distortions.KeystoneEffect))
+                    selectedProcessors.Add(ImageProcessorFactory.CreateKeystoneEffent());
+            }
+            return selectedProcessors;
+        }
+
+        private List<IOcrEngine> GetSelectedEngines()
+        {
+            List<IOcrEngine> selectedEngines = new List<IOcrEngine>();
+            var toggleSwitches = engines.Children.OfType<ToggleSwitch>();
+            foreach (var toggleSwitch in toggleSwitches)
+            {
+                if (toggleSwitch.IsOn == true)
+                {
+                    if (toggleSwitch.Tag.ToString().Equals(Engines.Microsoft))
+                        selectedEngines.Add(OcrEngineFactory.CreateMicrosoftOcrEngine());
+                    else if (toggleSwitch.Tag.ToString().Equals(Engines.Google))
+                        selectedEngines.Add(OcrEngineFactory.CreateGoogleOcrEngine());
                 }
             }
-            throw new Exception("radio button no selected");
+            return selectedEngines;
         }
     }
 }

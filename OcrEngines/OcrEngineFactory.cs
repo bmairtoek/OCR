@@ -2,12 +2,12 @@
 {
     static class OcrEngineFactory
     {
-        public static MicrosoftOcrEngine createMicrosoftOcrEngine()
+        public static MicrosoftOcrEngine CreateMicrosoftOcrEngine()
         {
             return new MicrosoftOcrEngine();
         }
 
-        public static GoogleOcrEngine createGoogleOcrEngine()
+        public static GoogleOcrEngine CreateGoogleOcrEngine()
         {
             return new GoogleOcrEngine();
         }
