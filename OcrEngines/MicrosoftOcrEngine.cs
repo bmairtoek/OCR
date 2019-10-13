@@ -11,20 +11,22 @@ namespace OCR.OcrEngines
 {
     class MicrosoftOcrEngine: IOcrEngine
     {
-        public async Task<string> RecognizeAsync(List<StorageFile> pickedFiles)
+        public async Task<List<string>> RecognizeAsync(List<StorageFile> pickedFiles)
         {
-            StringBuilder text = new StringBuilder();
+            List<string> results = new List<string>();
             foreach (StorageFile file in pickedFiles)
             {
-                OcrEngine engine = OcrEngine.TryCreateFromUserProfileLanguages();
+                StringBuilder text = new StringBuilder();
+                OcrEngine engine = OcrEngine.TryCreateFromLanguage(new Windows.Globalization.Language("en-US"));
                 var stream = await file.OpenAsync(FileAccessMode.Read);
                 BitmapDecoder decoder = await BitmapDecoder.CreateAsync(stream);
                 SoftwareBitmap softwareBitmap = await decoder.GetSoftwareBitmapAsync();
                 OcrResult ocrResult = await engine.RecognizeAsync(softwareBitmap);
                 foreach (OcrLine line in ocrResult.Lines)
                     text.Append(line.Text + "\n");
+                results.Add(text.ToString());
             }
-            return text.ToString();
+            return results;
         }
     }
 }

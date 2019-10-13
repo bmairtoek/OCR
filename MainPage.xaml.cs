@@ -14,12 +14,15 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using Windows.Storage;
-using OCR.OcrEngines;
-using OCR.Enums;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using System.Text;
+using OCR.OcrEngines;
+using OCR.Enums;
 using OCR.ImageProcessing;
+using OCR.TextComparator;
+using OCR.Model;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -31,6 +34,8 @@ namespace OCR
     public sealed partial class MainPage : Page
     {
         private List<StorageFile> pickedFiles = new List<StorageFile>();
+        private Dictionary<string, List<DistortedImage>> distortedImages = new Dictionary<string, List<DistortedImage>>();
+        private Dictionary<string, StorageFile> originalImages = new Dictionary<string, StorageFile>();
         private Informator informator;
         public MainPage()
         {
@@ -68,6 +73,8 @@ namespace OCR
                 return;
             this.informator.Clear();
             this.ClearTempFolder();
+            this.distortedImages.Clear();
+            this.originalImages.Clear();
 
             List<IImageProcessor> selectedDistorsions = this.GetSelectedDistorsions();
             int samples = Convert.ToInt32(SamplesSlider.Value);
@@ -77,22 +84,38 @@ namespace OCR
             List<IOcrEngine> selectedEngines = this.GetSelectedEngines();
             foreach (IOcrEngine engine in selectedEngines)
             {
-                string newText = string.Empty;
-                await Task.Run(async () => { newText = await engine.RecognizeAsync(pickedFiles); });
-                this.outputBlock.Text = newText;
+                var keys = distortedImages.Keys;
+                for (int i = 0; i < keys.Count; i++)
+                {
+                    List<StorageFile> filesToOcr = await this.GetFiles(keys.ElementAt(i));
+                    List<string> ocrOutput = null;
+                    await Task.Run(async () => { ocrOutput = await engine.RecognizeAsync(filesToOcr); });
+                    this.AnalizeOcrResults(engine.GetType().ToString(), keys.ElementAt(i), ocrOutput);
+                }
             }
+            this.informator.Log("");
+            this.informator.Log("FINISHED");
+            this.informator.Log("Results can be found at: "+Path.GetTempPath());
+
+        }
+        private async Task<List<StorageFile>> GetFiles(string key)
+        {
+            List<StorageFile> files = new List<StorageFile> { originalImages[key] };
+            foreach(DistortedImage image in distortedImages[key])
+            {
+                files.Add(await StorageFile.GetFileFromPathAsync(Path.Combine(image.folderPath, image.value.ToString() + ".png")));
+            }
+            return files;
         }
         private void ClearTempFolder()
         {
-            string tmpPath = Path.GetTempPath();
-            string[] files = Directory.GetFiles(tmpPath, "*.*", SearchOption.AllDirectories);
-            foreach (var file in files)
-            {
-                if (File.Exists(file))
-                {
-                    File.Delete(file);
-                }
-            }
+            DirectoryInfo tempDir = new DirectoryInfo(Path.GetTempPath());
+
+            foreach (FileInfo file in tempDir.GetFiles())
+                file.Delete();
+
+            foreach (DirectoryInfo dir in tempDir.GetDirectories())
+                dir.Delete(true);
         }
 
         private void CreateDistortedImages(List<IImageProcessor> selectedDistorsions, int samples)
@@ -102,20 +125,23 @@ namespace OCR
             foreach (StorageFile file in this.pickedFiles)
             {
                 string fileFolderPath = Directory.CreateDirectory(Path.Combine(tempPath, Path.GetFileName(file.Path))).FullName;
+                distortedImages[Path.GetFileName(file.Path)] = new List<DistortedImage>();
+                originalImages[Path.GetFileName(file.Path)] = file;
                 foreach (IImageProcessor distorsion in selectedDistorsions)
                 {
                     string distortionFolderPath = Directory.CreateDirectory(Path.Combine(fileFolderPath, distorsion.GetType().ToString())).FullName;
                     if (samples == 1)
                     {
-                        distorsion.Execute(distorsion.MaximalValue, file, distortionFolderPath);
+                        distorsion.Execute(distorsion.lastValue, file, distortionFolderPath);
                     }
                     else
                     {
                         for (int i = 1; i <= samples; i++)
                         {
-                            this.informator.Log("Executing "+distorsion.GetType().ToString()+" - "+i+" out of "+samples);
-                            float value = distorsion.MinimalValue + (distorsion.MaximalValue - distorsion.MinimalValue) / samples * i;
+                            this.informator.Log("   Executing "+distorsion.GetType().ToString()+" - "+i+" out of "+samples);
+                            float value = distorsion.startValue + (distorsion.lastValue - distorsion.startValue) / samples * i;
                             distorsion.Execute(value, file, distortionFolderPath);
+                            distortedImages[Path.GetFileName(file.Path)].Add(new DistortedImage(distorsion.GetType().ToString(), distortionFolderPath, value));
                         }
                     }
                 }
@@ -157,6 +183,28 @@ namespace OCR
                 }
             }
             return selectedEngines;
+        }
+
+        private void AnalizeOcrResults(string engineName, string imageName, List<string> ocrResults)
+        {
+            StringBuilder results = new StringBuilder();
+            string originalImageResult = ocrResults[0];
+            for (int i=1; i<ocrResults.Count; i++)
+            {
+                DistortedImage currentImage = distortedImages[imageName][i - 1];
+                results.Append(imageName);
+                results.Append(" | ");
+                results.Append(currentImage.distortion);
+                results.Append(" | ");
+                results.Append(currentImage.value);
+                results.Append(": ");
+                results.Append(LevenshteinDistance.Calculate(originalImageResult, ocrResults[i]).ToString());
+                results.Append("/");
+                results.Append((originalImageResult.Length).ToString()) ;
+                ;
+                results.Append(Environment.NewLine);
+            }
+            File.WriteAllText(Path.Combine(Path.GetTempPath(), imageName+"_"+engineName+".txt"), results.ToString());
         }
     }
 }

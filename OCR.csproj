@@ -130,6 +130,7 @@
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Model\DistortedImage.cs" />
     <Compile Include="OcrEngines\GoogleConfig\Constants.cs" />
     <Compile Include="OcrEngines\GoogleConfig\Creator.cs" />
     <Compile Include="OcrEngines\GoogleOcrEngine.cs" />
@@ -137,6 +138,7 @@
     <Compile Include="OcrEngines\MicrosoftOcrEngine.cs" />
     <Compile Include="OcrEngines\OcrEngineFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TextComparator\LevenshteinDistance.cs" />
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">
@@ -185,9 +187,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="TextComparator\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <SDKReference Include="WindowsDesktop, Version=10.0.17134.0">
       <Name>Windows Desktop Extensions for the UWP</Name>

@@ -6,6 +6,6 @@ namespace OCR.OcrEngines
 {
     interface IOcrEngine
     {
-        Task<string> RecognizeAsync(List<StorageFile> pickedFiles);
+        Task<List<string>> RecognizeAsync(List<StorageFile> pickedFiles);
     }
 }

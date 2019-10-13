@@ -7,8 +7,8 @@ namespace OCR.ImageProcessing
 {
     class Rotate : IImageProcessor
     {
-        public float MinimalValue { get; } = 0;
-        public float MaximalValue { get; } = 60;
+        public float startValue { get; } = 0;
+        public float lastValue { get; } = 60;
         public void Execute(float value, StorageFile inputFile, string outputFolderPath)
         {
             using (Image image = Image.Load(inputFile.OpenStreamForReadAsync().Result))

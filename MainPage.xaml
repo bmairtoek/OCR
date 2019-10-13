@@ -9,7 +9,7 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
     <Grid>
         <ScrollViewer VerticalScrollBarVisibility="Visible" Margin="512,10,10,10">
-            <TextBlock Name="outputBlock" Text="" TextWrapping="NoWrap" Margin="0,0,0,0"/>
+            <TextBlock Name="outputBlock" Text="" TextWrapping="NoWrap" Margin="0,0,0,0" IsTextSelectionEnabled="True" ScrollViewer.VerticalScrollBarVisibility="Auto"/>
         </ScrollViewer>
         <Grid Margin="-1,0,518,0">
             <Grid.ColumnDefinitions>
