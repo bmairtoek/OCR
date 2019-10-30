@@ -26,11 +26,10 @@ namespace OCR
         private List<StorageFile> pickedFiles = new List<StorageFile>();
         private Dictionary<string, List<DistortedImage>> distortedImages = new Dictionary<string, List<DistortedImage>>();
         private Dictionary<string, StorageFile> originalImages = new Dictionary<string, StorageFile>();
-        private Informator informator;
         public MainPage()
         {
             this.InitializeComponent();
-            this.informator = new Informator(outputBlock);
+            new Informator(outputBlock, outputScroller);
         }
 
         private async void Pick_Files(object sender, RoutedEventArgs e)
@@ -61,7 +60,7 @@ namespace OCR
         {
             if (this.pickedFiles.Count <= 0)
                 return;
-            this.informator.Clear();
+            Informator.Clear();
             this.ClearTempFolder();
             this.distortedImages.Clear();
             this.originalImages.Clear();
@@ -77,15 +76,27 @@ namespace OCR
                 var keys = distortedImages.Keys;
                 for (int i = 0; i < keys.Count; i++)
                 {
+                    string resultsPath = Directory.CreateDirectory(Path.Combine(Path.GetTempPath(), keys.ElementAt(i), "OCR-output")).FullName;
                     List<StorageFile> filesToOcr = await this.GetFiles(keys.ElementAt(i));
                     List<string> ocrOutput = null;
-                    await Task.Run(async () => { ocrOutput = await engine.RecognizeAsync(filesToOcr); });
+                    await Task.Run(async () => {
+                        ocrOutput = await engine.RecognizeAsync(filesToOcr);
+                    });
+                    File.WriteAllText(Path.Combine(resultsPath, "originalImage" + ".txt"), ocrOutput[0]);
+                    for (int j=1; j<ocrOutput.Count; j++)
+                    {
+                        File.WriteAllText(Path.Combine(resultsPath, this.distortedImages[keys.ElementAt(i)][j-1].distortion + "_" + filesToOcr[j].Name + ".txt"), ocrOutput[j] );
+                    }
                     this.AnalizeOcrResults(engine.GetType().ToString(), keys.ElementAt(i), ocrOutput);
+                    Informator.Log("Finished analizing image: " + keys.ElementAt(i));
+                    Informator.Log("");
                 }
+                Informator.Log(engine.GetType().ToString()+" has finished");
+                Informator.Log("");
             }
-            this.informator.Log("");
-            this.informator.Log("FINISHED");
-            this.informator.Log("Results can be found at: "+Path.GetTempPath());
+            Informator.Log("");
+            Informator.Log("FINISHED");
+            Informator.Log("Results can be found at: "+Path.GetTempPath());
 
         }
         private async Task<List<StorageFile>> GetFiles(string key)
@@ -128,16 +139,18 @@ namespace OCR
                     {
                         for (int i = 1; i <= samples; i++)
                         {
-                            this.informator.Log("   Executing "+distorsion.GetType().ToString()+" - "+i+" out of "+samples);
+                            Informator.Log("   Executing "+distorsion.GetType().ToString()+" - "+i+" out of "+samples);
                             float value = distorsion.startValue + (distorsion.lastValue - distorsion.startValue) / samples * i;
                             distorsion.Execute(value, file, distortionFolderPath);
                             distortedImages[Path.GetFileName(file.Path)].Add(new DistortedImage(distorsion.GetType().ToString(), distortionFolderPath, value));
                         }
                     }
                 }
-                this.informator.Log("Finished distorting image: " + Path.GetFileName(file.Path));
+                Informator.Log("Finished distorting image: " + Path.GetFileName(file.Path));
+                Informator.Log("");
             }
-            this.informator.Log("Finished creation of distorted images");
+            Informator.Log("Finished creation of distorted images");
+            Informator.Log("");
         }
         private List<IImageProcessor> GetSelectedDistorsions()
         {

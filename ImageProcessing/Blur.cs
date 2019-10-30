@@ -8,7 +8,7 @@ namespace OCR.ImageProcessing
     class Blur: IImageProcessor
     {
         public float startValue { get; } = 0;
-        public float lastValue { get; } = 7;
+        public float lastValue { get; } = 5;
         public void Execute(float value, StorageFile inputFile, string outputFolderPath)
         {
             // Windows.ApplicationModel.Package.Current.InstalledLocation.Path+"\\Assets\\sample.jpg"

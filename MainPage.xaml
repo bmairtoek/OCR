@@ -8,7 +8,7 @@
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
     <Grid>
-        <ScrollViewer VerticalScrollBarVisibility="Visible" Margin="512,10,10,10">
+        <ScrollViewer Name="outputScroller" VerticalScrollBarVisibility="Visible" Margin="512,10,10,10">
             <TextBlock Name="outputBlock" Text="" TextWrapping="NoWrap" Margin="0,0,0,0" IsTextSelectionEnabled="True" ScrollViewer.VerticalScrollBarVisibility="Auto"/>
         </ScrollViewer>
         <Grid Margin="-1,0,518,0">
@@ -62,7 +62,7 @@
                 <TextBlock Text="Ilość próbek dla pojedynczego zniekształcenia:" TextWrapping="Wrap"/>
             </StackPanel>
             <StackPanel Grid.Row="3" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Orientation="Horizontal">
-                <Slider x:Name="SamplesSlider" Width="100" SnapsTo="StepValues" Minimum="1" Maximum="30" Margin="0,0,10,0" Value="0"/>
+                <Slider x:Name="SamplesSlider" Width="100" SnapsTo="StepValues" Minimum="1" Maximum="60" Margin="0,0,10,0" Value="0"/>
                 <TextBlock Text="{Binding ElementName=SamplesSlider,Path=Value}" TextWrapping="NoWrap" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="18" Padding="0,0,0,5"/>
             </StackPanel>
             <StackPanel Grid.Row="4" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center">
