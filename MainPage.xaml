@@ -42,13 +42,11 @@
                 <ToggleSwitch OnContent="Rozmycie" OffContent="Rozmycie" Tag="Blur" HorizontalAlignment="Left"/>
                 <ToggleSwitch OnContent="Rotacja" OffContent="Rotacja" Tag="Rotation" HorizontalAlignment="Left"/>
                 <ToggleSwitch OnContent="Pochylenie" OffContent="Pochylenie" Tag="KeystoneEffect" HorizontalAlignment="Left"/>
-                <ToggleSwitch OnContent="Dummy" OffContent="Dummy" Tag="Dummy" HorizontalAlignment="Left"/>
             </StackPanel>
             <StackPanel x:Name="distortions2" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center">
-                <ToggleSwitch OnContent="Dummy" OffContent="Dummy" Tag="Dummy" HorizontalAlignment="Left"/>
-                <ToggleSwitch OnContent="Dummy" OffContent="Dummy" Tag="Dummy" HorizontalAlignment="Left"/>
-                <ToggleSwitch OnContent="Dummy" OffContent="Dummy" Tag="Dummy" HorizontalAlignment="Left"/>
-                <ToggleSwitch OnContent="Dummy" OffContent="Dummy" Tag="Dummy" HorizontalAlignment="Left"/>
+                <ToggleSwitch OnContent="Oświetlenie ↑" OffContent="Oświetlenie ↑" Tag="LightBrightness" HorizontalAlignment="Left"/>
+                <ToggleSwitch OnContent="Oświetlenie ↓" OffContent="Oświetlenie ↓" Tag="DarkBrightness" HorizontalAlignment="Left"/>
+                <ToggleSwitch OnContent="Kontrast" OffContent="Kontrast" Tag="Contrast" HorizontalAlignment="Left"/>
             </StackPanel>
             <StackPanel Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center">
                 <TextBlock Text="Wybierz Silnik OCR:"/>

@@ -161,12 +161,28 @@ namespace OCR
                 if (toggleSwitch.IsOn == false)
                     continue;
 
-                if (toggleSwitch.Tag.ToString().Equals(Distortions.Blur))
-                    selectedProcessors.Add(ImageProcessorFactory.CreateBlurProcessor());
-                else if (toggleSwitch.Tag.ToString().Equals(Distortions.Rotation))
-                    selectedProcessors.Add(ImageProcessorFactory.CreateRotateProcessor());
-                else if (toggleSwitch.Tag.ToString().Equals(Distortions.KeystoneEffect))
-                    selectedProcessors.Add(ImageProcessorFactory.CreateKeystoneEffent());
+                switch(toggleSwitch.Tag.ToString()) {
+                    case Distortions.Blur:
+                        selectedProcessors.Add(ImageProcessorFactory.CreateBlurProcessor());
+                        break;
+                    case Distortions.Rotation:
+                        selectedProcessors.Add(ImageProcessorFactory.CreateRotateProcessor());
+                        break;
+                    case Distortions.KeystoneEffect:
+                        selectedProcessors.Add(ImageProcessorFactory.CreateKeystoneEffect());
+                        break;
+                    case Distortions.LightBrightness:
+                        selectedProcessors.Add(ImageProcessorFactory.CreateLightBrightness());
+                        break;
+                    case Distortions.DarkBrightness:
+                        selectedProcessors.Add(ImageProcessorFactory.CreateDarkBrightness());
+                        break;
+                    case Distortions.Contrast:
+                        selectedProcessors.Add(ImageProcessorFactory.CreateContrast());
+                        break;
+                    default:
+                        break;
+                }
             }
             return selectedProcessors;
         }
@@ -200,7 +216,7 @@ namespace OCR
                 results.Append(currentImage.distortion);
                 results.Append(" | ");
                 results.Append(currentImage.value);
-                results.Append(": ");
+                results.Append(" | ");
                 results.Append(LevenshteinDistance.Calculate(originalImageResult, ocrResults[i]).ToString());
                 results.Append("/");
                 results.Append((originalImageResult.Length).ToString()) ;

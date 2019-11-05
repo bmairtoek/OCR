@@ -2,8 +2,11 @@
 {
     public sealed class Distortions
     {
-        public static readonly string Blur = "Blur";
-        public static readonly string Rotation = "Rotation";
-        public static readonly string KeystoneEffect = "KeystoneEffect";
+        public const string Blur = "Blur";
+        public const string Rotation = "Rotation";
+        public const string KeystoneEffect = "KeystoneEffect";
+        public const string DarkBrightness = "DarkBrightness";
+        public const string LightBrightness = "LightBrightness";
+        public const string Contrast = "Contrast";
     }
 }

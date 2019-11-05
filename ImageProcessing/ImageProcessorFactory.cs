@@ -10,9 +10,21 @@
         {
             return new Rotate();
         }
-        public static KeystoneEffect CreateKeystoneEffent()
+        public static KeystoneEffect CreateKeystoneEffect()
         {
             return new KeystoneEffect();
+        }
+        public static LightBrightness CreateLightBrightness()
+        {
+            return new LightBrightness();
+        }
+        public static DarkBrightness CreateDarkBrightness()
+        {
+            return new DarkBrightness();
+        }
+        public static Contrast CreateContrast()
+        {
+            return new Contrast();
         }
     }
 }

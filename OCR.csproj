@@ -122,9 +122,12 @@
     <Compile Include="Enums\Distortions.cs" />
     <Compile Include="Enums\Engines.cs" />
     <Compile Include="ImageProcessing\Blur.cs" />
+    <Compile Include="ImageProcessing\Contrast.cs" />
+    <Compile Include="ImageProcessing\DarkBrightness.cs" />
     <Compile Include="ImageProcessing\IImageProcessor.cs" />
     <Compile Include="ImageProcessing\ImageProcessorFactory.cs" />
     <Compile Include="ImageProcessing\KeystoneEffect.cs" />
+    <Compile Include="ImageProcessing\LightBrightness.cs" />
     <Compile Include="ImageProcessing\Rotate.cs" />
     <Compile Include="Informator.cs" />
     <Compile Include="MainPage.xaml.cs">
